@@ -9,10 +9,10 @@
 /**
  * Debug data
  * 
- * @param 	mixed   $data   Some data to debug
- * @param 	string  $label  Optionnal label
+ * @param   mixed   $data   Some data to debug
+ * @param   string  $label  Optionnal label
  * 
- * @return 	\JDZ\Debug\Debug  The debugger instance for chaining
+ * @return   \JDZ\Debug\Debug  The debugger instance for chaining
  * @see     \JDZ\Debug\Debug::add()
  * @author  Joffrey Demetz <joffrey.demetz@gmail.com>
  */

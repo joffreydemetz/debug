@@ -14,18 +14,18 @@ namespace JDZ\Debug\Item;
  */
 interface ItemInterface
 {
-	/**
-	 * Return the data
+  /**
+   * Return the data
    * 
-	 * @return 	mixed
-	 */
+   * @return   mixed
+   */
   public function getData();
   
-	/**
-	 * Return the label
+  /**
+   * Return the label
    * 
-	 * @return 	string
-	 */
+   * @return   string
+   */
   public function getLabel();
 }
 

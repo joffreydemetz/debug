@@ -4,7 +4,7 @@
     "description": "Simple PHP Debugger, proxy for the Symfony VarDumper",
     "keywords": ["debug","dump"],
     "homepage": "http://joffreydemetz.com/git/debug/",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "license": "MIT",
 
     "authors": [
@@ -23,13 +23,10 @@
     
     "autoload": {
         "psr-4": {
-            "JDZ\\Debug\\": ""
+            "JDZ\\Debug\\": "src"
         },
         "files": [
             "shortcuts.php"
-        ],
-        "exclude-from-classmap": [
-            "/Tests/"
         ]
     }
 }

@@ -10,9 +10,8 @@ namespace JDZ\Debug;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Test Debugger
- * 
- * @author Joffrey Demetz <joffrey.demetz@gmail.com>
+ * @package Test
+ * @author  Joffrey Demetz <joffrey.demetz@gmail.com>
  */
 class DebugTest extends TestCase
 {

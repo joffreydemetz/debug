@@ -17,30 +17,30 @@ abstract class AbstractItem implements ItemInterface
   /**
    * Item data
    * 
-   * @var 	mixed
+   * @var   mixed
    */
   protected $data;
   
   /**
    * Item label
    * 
-   * @var 	string
+   * @var   string
    */
   protected $label;
   
   /**
    * Item group
    * 
-   * @var 	string
+   * @var   string
    */
   protected $group;
   
   /**
    * Constructor
    * 
-   * @param 	mixed   $data     Item data
-   * @param 	string  $label    Item label
-   * @param 	string  $group    Item group
+   * @param   mixed   $data     Item data
+   * @param   string  $label    Item label
+   * @param   string  $group    Item group
    */
   public function __construct($data, $label='', $group='')
   {

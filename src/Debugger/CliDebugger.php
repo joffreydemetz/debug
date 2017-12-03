@@ -20,7 +20,7 @@ class CliDebugger extends Debug
   /**
    * {@inheritDoc}
    */
-	public function add($data, $label='', $group='')
+  public function add($data, $label='', $group='')
   {
     $this->stack[] = new Item($data, $label, $group);
     return $this;
@@ -29,7 +29,7 @@ class CliDebugger extends Debug
   /**
    * {@inheritDoc}
    */
-	public function display($backtrace=false, $echo=false)
+  public function display($backtrace=false, $echo=false)
   {
     if ( !$this->showDisplay() ){
       return;  
@@ -54,7 +54,7 @@ class CliDebugger extends Debug
     }
     
     $this->stack = [];
-	}
+  }
   
   /**
    * {@inheritDoc}
@@ -72,7 +72,7 @@ class CliDebugger extends Debug
     
     return $this;
   }
-	
+  
   /**
    * {@inheritDoc}
    */
@@ -89,6 +89,6 @@ class CliDebugger extends Debug
     $this->display($backtrace);
     
     exit(1);
-	}
+  }
 }
 

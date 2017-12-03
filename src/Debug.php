@@ -21,47 +21,47 @@ abstract class Debug implements DebuggerInterface
   /**
    * Debuging mode
    * 
-   * @var 	bool
+   * @var   bool
    */
   protected $active;
   
   /**
    * The current debug stack
    * 
-   * @var 	array
+   * @var   array
    */
   protected $stack;
   
   /**
    * Group some items of the stack
    * 
-   * @var 	array
-   * @todo 	building the idea
+   * @var   array
+   * @todo   building the idea
    */
   protected $groups;
   
   /**
    * The debugger instance
    * 
-   * @var 	Debug
+   * @var   Debug
    */
   protected static $instance;
   
-	/**
-	 * The filesystem basepath
+  /**
+   * The filesystem basepath
    * 
-	 * @var 	string
-	 */
+   * @var   string
+   */
   protected static $basePath = '';
   
-	/**
-	 * Set the base path
+  /**
+   * Set the base path
    * 
    * Used to strip basepath from filepaths
    * 
-	 * @param 	string  $basePath   The application basepath
-	 * @return 	void
-	 */
+   * @param   string  $basePath   The application basepath
+   * @return   void
+   */
   public static function setBasePath($basePath)
   {
     static::$basePath = rtrim($basePath, DIRECTORY_SEPARATOR).'/';
@@ -70,7 +70,7 @@ abstract class Debug implements DebuggerInterface
   /**
    * Get the debugger instance 
    *
-   * @return 	Debug    The debugger instance
+   * @return   Debug    The debugger instance
    */
   public static function getInstance()
   {
@@ -98,7 +98,7 @@ abstract class Debug implements DebuggerInterface
   /**
    * {@inheritdoc}
    */
-	public function activate($state=true)
+  public function activate($state=true)
   {
     $this->active = (bool)$state;
     return $this;
@@ -107,34 +107,34 @@ abstract class Debug implements DebuggerInterface
   /**
    * {@inheritdoc}
    */
-	public function end($backtrace=true)
+  public function end($backtrace=true)
   {
     $this->display($backtrace, true);
     exit(1);
-	}
+  }
   
   /**
    * Check if debugger is ok for display
    *
-   * @return 	bool
+   * @return   bool
    */
-	protected function showDisplay()
+  protected function showDisplay()
   {
-		if ( $this->active === false ){
+    if ( $this->active === false ){
       return false; 
     }
     
-		if ( count($this->stack) === 0 ){
+    if ( count($this->stack) === 0 ){
       return false; 
     }
     
     return true;
-	}
+  }
   
   /**
    * Pretty print the backtrace
    *
-   * @return 	void
+   * @return   void
    */
   protected function getBacktrace()
   {
@@ -219,6 +219,6 @@ abstract class Debug implements DebuggerInterface
     
     // dump($backtrace);
     return $backtrace;
-	}
+  }
 }
 

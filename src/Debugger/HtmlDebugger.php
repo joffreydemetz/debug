@@ -24,7 +24,7 @@ class HtmlDebugger extends Debug
   /**
    * {@inheritDoc}
    */
-	public function add($data, $label='', $group='')
+  public function add($data, $label='', $group='')
   {
     $this->stack[] = new Item($data, $label, $group);
     return $this;
@@ -33,7 +33,7 @@ class HtmlDebugger extends Debug
   /**
    * {@inheritDoc}
    */
-	public function display($backtrace=false, $echo=false)
+  public function display($backtrace=false, $echo=false)
   {
     if ( !$this->showDisplay() ){
       return false;  
@@ -120,7 +120,7 @@ class HtmlDebugger extends Debug
       'style'  => $style,
       'html'   => $html,
     ];
-	}
+  }
   
   /**
    * {@inheritDoc}
@@ -142,7 +142,7 @@ class HtmlDebugger extends Debug
     
     return $this;
   }
-	
+  
   /**
    * {@inheritDoc}
    */
@@ -183,6 +183,6 @@ class HtmlDebugger extends Debug
     echo '</html>'."\n";
     
     exit(1);
-	}
+  }
 }
 
