@@ -9,7 +9,6 @@ namespace JDZ\Debug\Debugger;
 
 use JDZ\Debug\Debug;
 use JDZ\Debug\Item\HtmlItem as Item;
-
 use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
@@ -48,29 +47,37 @@ class HtmlDebugger extends Debug
     
     foreach($this->stack as $key => $item){
       $value = $item->getData();
+      
       $output = '';
-      $dumper->dump($cloner->cloneVar($value), function($line, $depth) use (&$output){
-        if ( $depth >= 0 ){
-          $output .= str_repeat('  ', $depth).$line."\n";
-        }
-      });
       
-      $output = preg_replace_callback("/<script>(.+)<\/script>/iUs", function($m) use(&$script){
-        if ( preg_match("/^Sfdump\(/", $m[1]) ){
-          $script .= '<script>typeof jQuery === \'undefined\' ? '.$m[1].' : jQuery(document).ready(function(){ '.$m[1].' });</script>'."\n";
-        }
-        elseif ( !$script ){
-          $script .= '<script>'.$m[1].'</script>'."\n";
-        }
-        return '';
-      }, $output);
+      if ( is_string($value) && preg_match("/<pre class=\"query\">/", $value) ){
+        $output = $value;
+      }
+      else {
+        $dumper->dump($cloner->cloneVar($value), function($line, $depth) use (&$output){
+          if ( $depth >= 0 ){
+            $output .= str_repeat('  ', $depth).$line."\n";
+          }
+        });
+        
+        $output = preg_replace_callback("/<script>(.+)<\/script>/iUs", function($m) use(&$script){
+          if ( preg_match("/^Sfdump\(/", $m[1]) ){
+            $script .= '<script>typeof jQuery === \'undefined\' ? '.$m[1].' : jQuery(document).ready(function(){ '.$m[1].' });</script>'."\n";
+          }
+          elseif ( !$script ){
+            $script .= '<script>'.$m[1].'</script>'."\n";
+          }
+          return '';
+        }, $output);
+        
+        $output = preg_replace_callback("/<style>(.+)<\/style>/iUs", function($m) use(&$style){
+          if ( !$style ){
+            $style .= '<style>'.$m[1].'</style>'."\n";
+          }
+          return '';
+        }, $output);
+      }
       
-      $output = preg_replace_callback("/<style>(.+)<\/style>/iUs", function($m) use(&$style){
-        if ( !$style ){
-          $style .= '<style>'.$m[1].'</style>'."\n";
-        }
-        return '';
-      }, $output);
       
       if ( $label = $item->getLabel() ){
         $html .= ' <h3>'.$label.'</h3>'."\n";

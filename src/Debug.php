@@ -107,6 +107,14 @@ abstract class Debug implements DebuggerInterface
   /**
    * {@inheritdoc}
    */
+  public function hasStack()
+  {
+    return count($this->stack) > 0;
+  }
+  
+  /**
+   * {@inheritdoc}
+   */
   public function end($backtrace=true)
   {
     $this->display($backtrace, true);

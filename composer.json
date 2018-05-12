@@ -3,22 +3,21 @@
  	"type": "library",
     "description": "Simple PHP Debugger, proxy for the Symfony VarDumper",
     "keywords": ["debug","dump"],
-    "homepage": "http://joffreydemetz.com/git/debug/",
-    "version": "1.2.0",
+    "homepage": "https://github.com/joffreydemetz/debug/",
+    "version": "1.2.1",
     "license": "MIT",
 
     "authors": [
         {
             "name": "Joffrey Demetz",
             "email": "joffrey.demetz@gmail.com",
-            "homepage": "http://joffreydemetz.com",
+            "homepage": "https://joffreydemetz.com",
             "role": "Lead"
         }
     ],
 
     "require": {
-        "php": ">=5.6",
-        "symfony/var-dumper": "^3.3"
+        "symfony/var-dumper": "^3.4|^4.0"
     },
     
     "autoload": {

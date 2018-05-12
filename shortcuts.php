@@ -14,7 +14,7 @@
  * 
  * @return   \JDZ\Debug\Debug  The debugger instance for chaining
  * @see     \JDZ\Debug\Debug::add()
- * @author  Joffrey Demetz <joffrey.demetz@gmail.com>
+ * @author Joffrey Demetz <joffrey.demetz@gmail.com>
  */
 function debugMe($data, $label='')
 {
@@ -25,7 +25,7 @@ function debugMe($data, $label='')
  * Export debug to a string
  * 
  * @return  string 
- * @author  Joffrey Demetz <joffrey.demetz@gmail.com>
+ * @author Joffrey Demetz <joffrey.demetz@gmail.com>
  */
 function debugExport()
 {
