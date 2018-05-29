@@ -9,7 +9,6 @@ namespace JDZ\Debug\Debugger;
 
 use JDZ\Debug\Debug;
 use JDZ\Debug\Item\HtmlItem as Item;
-use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
