@@ -31,7 +31,7 @@ class HtmlDebugger extends Debug
   /**
    * {@inheritDoc}
    */
-  public function display($backtrace=false, $echo=false)
+  public function toModule()
   {
     if ( !$this->showDisplay() ){
       return false;  
@@ -43,6 +43,39 @@ class HtmlDebugger extends Debug
     $html   = '';
     $script = '';
     $style  = '';
+    
+    if ( $this->profilers ){
+      foreach($this->profilers as $name => $profiler){
+        if ( $name === 'DB' ){
+          $html .= $this->dumpDbProfiler($profiler);
+          continue;
+        }
+        
+        $columns = array_keys($profiler[0]);
+        
+        $html .= ' <div class="profiler">'."\n";
+        $html .= '  <h3>'.$name.'</h3>'."\n";
+        $html .= '  <table class="table">'."\n";
+        $html .= '   <thead>'."\n";
+        $html .= '    <tr>'."\n";
+        foreach($columns as $column){
+          $html .= '     <th>'.$column.'</th>'."\n";
+        }
+        $html .= '    </tr>'."\n";
+        $html .= '   </thead>'."\n";
+        $html .= '   <tbody>'."\n";
+        foreach($profiler as $row){
+          $html .= '    <tr>';
+          foreach($columns as $column){
+            $html .= '     <td>'.$row[$column].'</td>'."\n";
+          }
+          $html .= '    </tr>'."\n";
+        }
+        $html .= '   </tbody>'."\n";
+        $html .= '  </table>'."\n";
+        $html .= ' </div>'."\n";
+      }
+    }
     
     foreach($this->stack as $key => $item){
       $value = $item->getData();
@@ -59,7 +92,7 @@ class HtmlDebugger extends Debug
           }
         });
         
-        $output = preg_replace_callback("/<script>(.+)<\/script>/iUs", function($m) use(&$script){
+        $output = preg_replace_callback("/<script>((?!(<\/script>)).+)<\/script>/msU", function($m) use(&$script){
           if ( preg_match("/^Sfdump\(/", $m[1]) ){
             $script .= '<script>typeof jQuery === \'undefined\' ? '.$m[1].' : jQuery(document).ready(function(){ '.$m[1].' });</script>'."\n";
           }
@@ -69,7 +102,7 @@ class HtmlDebugger extends Debug
           return '';
         }, $output);
         
-        $output = preg_replace_callback("/<style>(.+)<\/style>/iUs", function($m) use(&$style){
+        $output = preg_replace_callback("/<style>((?!(<\/style>)).+)<\/style>/msU", function($m) use(&$style){
           if ( !$style ){
             $style .= '<style>'.$m[1].'</style>'."\n";
           }
@@ -86,9 +119,112 @@ class HtmlDebugger extends Debug
       $html .= '</div>'."\n";
     }
     
-    if ( $backtrace === true ){
-      $html .= ' <hr />'."\n";
+    $this->profilers = [];
+    $this->stack = [];
+    
+    return [
+      'script' => $script,
+      'style'  => $style,
+      'html'   => $html,
+    ];
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  public function display($backtrace=false, $echo=false)
+  {
+    if ( !$this->showDisplay() ){
+      return false;  
+    }
+    
+    $cloner = new VarCloner();
+    $dumper = new HtmlDumper();
+    
+    $html   = '';
+    $script = '';
+    $style  = '';
+    
+    if ( $this->profilers ){
+      foreach($this->profilers as $name => $profiler){
+        if ( $name === 'DB' ){
+          $html .= $this->dumpDbProfiler($profiler);
+          continue;
+        }
+        
+        $columns = array_keys($profiler[0]);
+        
+        $html .= ' <div class="profiler">'."\n";
+        $html .= '  <h3>'.$name.'</h3>'."\n";
+        $html .= '  <table class="table">'."\n";
+        $html .= '   <thead>'."\n";
+        $html .= '    <tr>'."\n";
+        foreach($columns as $column){
+          $html .= '     <th>'.$column.'</th>'."\n";
+        }
+        $html .= '    </tr>'."\n";
+        $html .= '   </thead>'."\n";
+        $html .= '   <tbody>'."\n";
+        foreach($profiler as $row){
+          $html .= '    <tr>';
+          foreach($columns as $column){
+            $html .= '     <td>'.$row[$column].'</td>'."\n";
+          }
+          $html .= '    </tr>'."\n";
+        }
+        $html .= '   </tbody>'."\n";
+        $html .= '  </table>'."\n";
+        $html .= ' </div>'."\n";
+      }
+    }
+    
+    foreach($this->stack as $key => $item){
+      $value = $item->getData();
       
+      $output = '';
+      
+      if ( is_string($value) && preg_match("/<pre class=\"query\">/", $value) ){
+        $output = $value;
+      }
+      else {
+        $dumper->dump($cloner->cloneVar($value), function($line, $depth) use (&$output){
+          if ( $depth >= 0 ){
+            $output .= str_repeat('  ', $depth).$line."\n";
+          }
+        });
+        
+        $output = preg_replace_callback("/<script>((?!(<\/script>)).+)<\/script>/msU", function($m) use(&$script){
+          if ( preg_match("/^Sfdump\(/", $m[1]) ){
+            $script .= '<script>typeof jQuery === \'undefined\' ? '.$m[1].' : jQuery(document).ready(function(){ '.$m[1].' });</script>'."\n";
+          }
+          elseif ( !$script ){
+            $script .= '<script>'.$m[1].'</script>'."\n";
+          }
+          return '';
+        }, $output);
+        
+        $output = preg_replace_callback("/<style>((?!(<\/style>)).+)<\/style>/msU", function($m) use(&$style){
+          if ( !$style ){
+            $style .= '<style>'.$m[1].'</style>'."\n";
+          }
+          return '';
+        }, $output);
+      }
+      
+      
+      if ( $label = $item->getLabel() ){
+        $html .= ' <h3>'.$label.'</h3>'."\n";
+      }
+      $html .= '<div class="item">'."\n";
+      $html.= $output;
+      $html .= '</div>'."\n";
+    }
+    
+    $this->profilers = [];
+    $this->stack = [];
+    
+    if ( $backtrace ){
+      $html .= ' <hr />'."\n";
       $html .= ' <div class="backtrace">'."\n";
       $html .= '  <table>'."\n";
       $html .= '   <thead>'."\n";
@@ -114,8 +250,6 @@ class HtmlDebugger extends Debug
       $html .= '  </table>'."\n";
       $html .= ' </div>'."\n";
     }
-    
-    $this->stack = [];
     
     if ( $echo ){
       echo $style.$html.$script;
@@ -168,15 +302,20 @@ class HtmlDebugger extends Debug
     echo '  <meta charset="UTF-8" />'."\n";
     echo '  <title>Debug</title>'."\n";
     echo '  <style>'."\n";
-    echo '  #debugger { padding:20px 0; background:#888; }'."\n";
-    echo '  #debugger > h3 { display:block; font-weight:700; margin:0 20px; padding:0; }'."\n";
-    echo '  #debugger > .item { background-color:#f9f9f9; margin:10px 20px; }'."\n";
-    echo '  #debugger > .backtrace { background-color:#f9f9f9; margin:10px 20px 0 20px; }'."\n";
-    echo '  #debugger > .backtrace > table { width:100%; max-width:100%; background-color:transparent; border-spacing:0; border-collapse:collapse; }'."\n";
-    echo '  #debugger > .backtrace > table > thead > tr > th, #debugger > .backtrace > table > tbody > tr > td { padding:8px; line-height:1.42857143; vertical-align:top; border-top: 1px solid #ddd; }'."\n";
-    echo '  #debugger > .backtrace > table > thead > tr > th { vertical-align:bottom; border-bottom:2px solid #ddd; }'."\n";
-    echo '  #debugger > .backtrace > table > tbody > tr > th { padding:8px; border-top: 1px solid #ddd; }'."\n";
-    echo '  #debugger > .backtrace > table > thead:first-child > tr:first-child > th { border-top:0; }'."\n";
+    echo '  #debugger { background:#888; position: relative; z-index: 99999999; padding: 20px 0; }'."\n";
+    echo '  #debugger h3 { font-size: 16px; color: #222; display:block; font-weight:700; margin:0 20px; padding: 4px 6px; }'."\n";
+    echo '  #debugger h4 { font-size: 14px; color: #333; display:block; font-weight:700; margin:0 20px; padding: 4px 6px; }'."\n";
+    echo '  #debugger pre.query { font-size: 12px; word-break: break-word; word-wrap: break-word; white-space: normal; padding: 4px 6px; }'."\n";
+    echo '  #debugger pre.query > span { display: block; position: absolute; bottom: 0; right: 0; font-weight: 700; background: rgba(0,0,0,.5); padding: 2px 4px; }'."\n";
+    echo '  #debugger .item { background-color:#f9f9f9; margin:10px 20px; }'."\n";
+    echo '  #debugger .profiler { background-color:#f9f9f9; margin:10px 20px 0 20px; }'."\n";
+    echo '  #debugger .profiler > h3 { font-size: 14px; }'."\n";
+    echo '  #debugger .backtrace { background-color:#f9f9f9; margin:10px 20px 0 20px; }'."\n";
+    echo '  #debugger .backtrace > table { width:100%; max-width:100%; background-color:transparent; border-spacing:0; border-collapse:collapse; }'."\n";
+    echo '  #debugger .backtrace > table > thead > tr > th, #debugger > .backtrace > table > tbody > tr > td { padding:8px; line-height:1.42857143; vertical-align:top; border-top: 1px solid #ddd; }'."\n";
+    echo '  #debugger .backtrace > table > thead > tr > th { vertical-align:bottom; border-bottom:2px solid #ddd; }'."\n";
+    echo '  #debugger .backtrace > table > tbody > tr > th { padding:8px; border-top: 1px solid #ddd; }'."\n";
+    echo '  #debugger .backtrace > table > thead:first-child > tr:first-child > th { border-top:0; }'."\n";
     echo '  </style>'."\n";
     echo ' </head>'."\n";
     echo ' <body>'."\n";
@@ -190,5 +329,33 @@ class HtmlDebugger extends Debug
     
     exit(1);
   }
+  
+  protected function dumpDbProfiler($queries)
+  {
+    $html  = '';
+    $html .= ' <div class="profiler">'."\n";
+    $html .= '  <h3>Queries</h3>'."\n";
+    
+    $total = 0;
+    foreach($queries as $row){
+      $total += $row['Duration'];
+      
+      $html .= '  <div class="query">';
+      $html .= '   <pre class="query">';
+      $html .= $row['Query']."\n";
+      $html .= '    <span>'.($row['Duration']*1000000).' µs</span>';
+      $html .= '   </pre>';
+      $html .= '   <pre class="query-infos">';
+      foreach($row['infos'] as $info){
+        $html .= "\n".$info['Status'].' : '.($info['Duration']*1000000).' µs';
+      }
+      $html .= '   </pre>';
+      $html .= '  </div>';
+    }
+    $html .= '  <p>Total : '.($total*1000).'ms</p>';
+    $html .= ' </div>'."\n";
+    
+    return $html;
+  }  
 }
 

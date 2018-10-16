@@ -49,7 +49,10 @@ abstract class AbstractItem implements ItemInterface
     $this->group   = $group;
     
     if ( is_object($this->data) ){
-      if ( method_exists($this->data, 'getProperties') ){
+      if ( method_exists($this->data, 'all') ){
+        $this->data = $this->data->all();
+      }
+      elseif ( method_exists($this->data, 'getProperties') ){
         $this->data = $this->data->getProperties();
       }
       elseif ( method_exists($this->data, 'export') ){

@@ -23,14 +23,14 @@ abstract class Debug implements DebuggerInterface
    * 
    * @var   bool
    */
-  protected $active;
+  protected $active = false;
   
   /**
    * The current debug stack
    * 
    * @var   array
    */
-  protected $stack;
+  protected $stack = [];
   
   /**
    * Group some items of the stack
@@ -38,7 +38,14 @@ abstract class Debug implements DebuggerInterface
    * @var   array
    * @todo   building the idea
    */
-  protected $groups;
+  protected $groups = [];
+  
+  /**
+   * Some full content profilers (DB profiles, etc.)
+   * 
+   * @var   array
+   */
+  protected $profilers = [];
   
   /**
    * The debugger instance
@@ -85,36 +92,28 @@ abstract class Debug implements DebuggerInterface
     return self::$instance;
   }
   
-  /**
-   * Constructor
-   */
-  public function __construct()
+  public function addProfiler($name, $profiler)
   {
-    $this->active  = false;
-    $this->stack   = [];
-    $this->groups  = [];
+    $this->profilers[$name] = $profiler;
+    return $this;
   }
   
-  /**
-   * {@inheritdoc}
-   */
   public function activate($state=true)
   {
     $this->active = (bool)$state;
     return $this;
   }
   
-  /**
-   * {@inheritdoc}
-   */
   public function hasStack()
   {
     return count($this->stack) > 0;
   }
   
-  /**
-   * {@inheritdoc}
-   */
+  public function hasProfilers()
+  {
+    return count($this->profilers) > 0;
+  }
+  
   public function end($backtrace=true)
   {
     $this->display($backtrace, true);
@@ -128,15 +127,7 @@ abstract class Debug implements DebuggerInterface
    */
   protected function showDisplay()
   {
-    if ( $this->active === false ){
-      return false; 
-    }
-    
-    if ( count($this->stack) === 0 ){
-      return false; 
-    }
-    
-    return true;
+    return $this->active && (count($this->stack) || count($this->profilers));
   }
   
   /**
