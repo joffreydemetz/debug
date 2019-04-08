@@ -71,45 +71,50 @@ class HtmlDebugger extends Debug
       }
     }
     
-    foreach($this->stack as $key => $item){
-      $value = $item->getData();
-      
-      $output = '';
-      
-      if ( is_string($value) && preg_match("/<pre class=\"query\">/", $value) ){
-        $output = $value;
-      }
-      else {
-        $dumper->dump($cloner->cloneVar($value), function($line, $depth) use (&$output){
-          if ( $depth >= 0 ){
-            $output .= str_repeat('  ', $depth).$line."\n";
-          }
-        });
+    if ( $this->stack ){
+      $html .= ' <div class="profiler">'."\n";
+      foreach($this->stack as $key => $item){
+        $value = $item->getData();
         
-        $output = preg_replace_callback("/<script>((?!(<\/script>)).+)<\/script>/msU", function($m) use(&$script){
-          if ( preg_match("/^Sfdump\(/", $m[1]) ){
-            $script .= '<script>typeof jQuery === \'undefined\' ? '.$m[1].' : jQuery(document).ready(function(){ '.$m[1].' });</script>'."\n";
-          }
-          elseif ( !$script ){
-            $script .= '<script>'.$m[1].'</script>'."\n";
-          }
-          return '';
-        }, $output);
+        $output = '';
         
-        $output = preg_replace_callback("/<style>((?!(<\/style>)).+)<\/style>/msU", function($m) use(&$style){
-          if ( !$style ){
-            $style .= '<style>'.$m[1].'</style>'."\n";
-          }
-          return '';
-        }, $output);
+        if ( is_string($value) && preg_match("/<pre class=\"query\">/", $value) ){
+          $output = $value;
+        }
+        else {
+          $dumper->dump($cloner->cloneVar($value), function($line, $depth) use (&$output){
+            if ( $depth >= 0 ){
+              $output .= str_repeat('  ', $depth).$line."\n";
+            }
+          });
+          
+          $output = preg_replace_callback("/<script>((?!(<\/script>)).+)<\/script>/msU", function($m) use(&$script){
+            if ( preg_match("/^Sfdump\(/", $m[1]) ){
+              $script .= '<script>typeof jQuery === \'undefined\' ? '.$m[1].' : jQuery(document).ready(function(){ '.$m[1].' });</script>'."\n";
+            }
+            elseif ( !$script ){
+              $script .= '<script>'.$m[1].'</script>'."\n";
+            }
+            return '';
+          }, $output);
+          
+          $output = preg_replace_callback("/<style>((?!(<\/style>)).+)<\/style>/msU", function($m) use(&$style){
+            if ( !$style ){
+              $style .= '<style>'.$m[1].'</style>'."\n";
+            }
+            return '';
+          }, $output);
+        }
+        
+        
+        if ( $label = $item->getLabel() ){
+          $html .= ' <h3>'.$label.'</h3>'."\n";
+        }
+        $html .= '<div class="item">'."\n";
+        $html.= $output;
+        $html .= '</div>'."\n";
       }
       
-      
-      if ( $label = $item->getLabel() ){
-        $html .= ' <h3>'.$label.'</h3>'."\n";
-      }
-      $html .= '<div class="item">'."\n";
-      $html.= $output;
       $html .= '</div>'."\n";
     }
     
@@ -169,47 +174,52 @@ class HtmlDebugger extends Debug
       }
     }
     
-    foreach($this->stack as $key => $item){
-      $value = $item->getData();
-      
-      $output = '';
-      
-      if ( is_string($value) && preg_match("/<pre class=\"query\">/", $value) ){
-        $output = $value;
-      }
-      else {
-        $dumper->dump($cloner->cloneVar($value), function($line, $depth) use (&$output){
-          if ( $depth >= 0 ){
-            $output .= str_repeat('  ', $depth).$line."\n";
-          }
-        });
+    if ( $this->stack ){
+      $html .= ' <div class="profiler">'."\n";
+      foreach($this->stack as $key => $item){
+        $value = $item->getData();
         
-        $output = preg_replace_callback("/<script>((?!(<\/script>)).+)<\/script>/msU", function($m) use(&$script){
-          if ( preg_match("/^Sfdump\(/", $m[1]) ){
-            $script .= '<script>typeof jQuery === \'undefined\' ? '.$m[1].' : jQuery(document).ready(function(){ '.$m[1].' });</script>'."\n";
-          }
-          elseif ( !$script ){
-            $script .= '<script>'.$m[1].'</script>'."\n";
-          }
-          return '';
-        }, $output);
+        $output = '';
         
-        $output = preg_replace_callback("/<style>((?!(<\/style>)).+)<\/style>/msU", function($m) use(&$style){
-          if ( !$style ){
-            $style .= '<style>'.$m[1].'</style>'."\n";
-          }
-          return '';
-        }, $output);
+        if ( is_string($value) && preg_match("/<pre class=\"query\">/", $value) ){
+          $output = $value;
+        }
+        else {
+          $dumper->dump($cloner->cloneVar($value), function($line, $depth) use (&$output){
+            if ( $depth >= 0 ){
+              $output .= str_repeat('  ', $depth).$line."\n";
+            }
+          });
+          
+          $output = preg_replace_callback("/<script>((?!(<\/script>)).+)<\/script>/msU", function($m) use(&$script){
+            if ( preg_match("/^Sfdump\(/", $m[1]) ){
+              $script .= '<script>typeof jQuery === \'undefined\' ? '.$m[1].' : jQuery(document).ready(function(){ '.$m[1].' });</script>'."\n";
+            }
+            elseif ( !$script ){
+              $script .= '<script>'.$m[1].'</script>'."\n";
+            }
+            return '';
+          }, $output);
+          
+          $output = preg_replace_callback("/<style>((?!(<\/style>)).+)<\/style>/msU", function($m) use(&$style){
+            if ( !$style ){
+              $style .= '<style>'.$m[1].'</style>'."\n";
+            }
+            return '';
+          }, $output);
+        }
+        
+        
+        if ( $label = $item->getLabel() ){
+          $html .= ' <h3>'.$label.'</h3>'."\n";
+        }
+        $html .= '<div class="item">'."\n";
+        $html.= $output;
+        $html .= '</div>'."\n";
       }
-      
-      
-      if ( $label = $item->getLabel() ){
-        $html .= ' <h3>'.$label.'</h3>'."\n";
-      }
-      $html .= '<div class="item">'."\n";
-      $html.= $output;
-      $html .= '</div>'."\n";
+      $html .= ' </div>'."\n";      
     }
+
     
     $this->profilers = [];
     $this->stack = [];
@@ -288,6 +298,7 @@ class HtmlDebugger extends Debug
     echo '  <title>Debug</title>'."\n";
     echo '  <style>'."\n";
     echo '  #debugger { background:#888; position: relative; z-index: 99999999; padding: 20px 0; }'."\n";
+    echo '  #debugger * { font-size: initial !important; text-transform: initial !important; }'."\n";
     echo '  #debugger h3 { font-size: 16px; color: #222; display:block; font-weight:700; margin:0 20px; padding: 4px 6px; }'."\n";
     echo '  #debugger h4 { font-size: 14px; color: #333; display:block; font-weight:700; margin:0 20px; padding: 4px 6px; }'."\n";
     echo '  #debugger pre.query { font-size: 12px; word-break: break-word; word-wrap: break-word; white-space: normal; padding: 4px 6px; }'."\n";
@@ -337,7 +348,7 @@ class HtmlDebugger extends Debug
       $html .= '   </pre>';
       $html .= '  </div>';
     }
-    $html .= '  <p>Total : '.($total*1000).'ms</p>';
+    $html .= '  <p class="time">Total : '.($total*1000).'ms</p>';
     $html .= ' </div>'."\n";
     
     return $html;
