@@ -31,9 +31,9 @@ class CliDebugger extends Debug
     
     foreach($this->stack as $key => $item){
       if ( $label = $item->getLabel() ){
-        dump("-- ".$label." --");
+        dd("-- ".$label." --");
       }
-      dump($item->getData());
+      dd($item->getData());
     }
     
     if ( $backtrace === true ){
@@ -44,7 +44,7 @@ class CliDebugger extends Debug
         $trace[] = $i.' | '.$_trace['file'].' | '.$_trace['line'].' | '.$_trace['function'];
       }
       
-      dump(implode(PHP_EOL, $trace));
+      dd(implode(PHP_EOL, $trace));
     }
     
     $this->stack = [];
